@@ -35,20 +35,13 @@ async function getProducts (){
       
     });
 
-    //
- var optionsArray;
+    
   variantsProductList.forEach(val => {
     val.options.forEach(varValue => {
       varValue.shopify_id = varValue.product_id,
       delete varValue.id;
       delete varValue.product_id;
-      varValue.variant = true,
-      optionsArray = varValue.values.reduce((s,a ) => {
-        s.push({name: a});
-        return s ;
-      }, []);
-      varValue.values = optionsArray;
-
+      varValue.variant = true
     });
   });
 
@@ -73,9 +66,7 @@ async function getProducts (){
         description: data.body_html,
         slug: data.handle,
         hasVariants: true,
-        //price: data.variants[0].price,
         sku: data.sku,
-        //options: data.options
       }
     }));
     return singleProductListFormat;
@@ -151,12 +142,10 @@ async function createVariants(){
   } catch(e){
     console.log(e);
   }
-
 }
 
 getProducts().then(() => {
    createSwellProducts(singleProductListFormat, variantsProductListFormat);
-   
   createVariants();
 });
 
