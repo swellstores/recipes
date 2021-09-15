@@ -70,6 +70,11 @@ async function createSwellCustomers(list) {
 }
 
 
-getCustomers().then(() => {
-    createSwellCustomers(customerObjectList);
-});
+// getCustomers().then(() => {
+//     createSwellCustomers(customerObjectList);
+// });
+
+module.exports.main = async function main(){
+    await getCustomers();
+    await createSwellCustomers(customerObjectList);
+}

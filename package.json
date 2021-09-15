@@ -5,15 +5,15 @@
   "main": "migration.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "orders": "node -e 'require(\"./orders\").main()'"
-   
+    "orders": "node -e 'require(\"./orders\").main()'",
+    "products": "node -e 'require(\"./products\").main()'",
+    "customers": "node -e 'require(\"./customers\").main()'"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.21.1",
     "dotenv": "^10.0.0",
-    "html-to-text": "^8.0.0",
     "swell-node": "^4.0.5"
   }
 }

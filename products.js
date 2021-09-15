@@ -11,6 +11,9 @@ var singleProductList;
 var variantsProductList;
 var swellParentsList;
 
+//TODO: Add stock quantities
+//TODO: Add type
+//TODO: Add delivery
 
 async function getProducts (){
   try {
@@ -144,10 +147,16 @@ async function createVariants(){
   }
 }
 
-getProducts().then(() => {
-   createSwellProducts(singleProductListFormat, variantsProductListFormat);
-  createVariants();
-});
+// getProducts().then(() => {
+//    createSwellProducts(singleProductListFormat, variantsProductListFormat);
+//   createVariants();
+// });
+
+module.exports.main = async function main(){
+  await getProducts();
+  await createSwellProducts(singleProductListFormat, variantsProductListFormat);
+  await createVariants();
+}
 
 
 
