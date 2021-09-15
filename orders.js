@@ -47,7 +47,9 @@ if (ordersList[order].financial_status == 'paid'){
 
 //Set fulfillment status
 if (ordersList[order].fulfillment_status == 'unfulfilled' || ordersList[order].fulfillment_status == null || ordersList[order].fulfillment_status == 'partial'){
-  ordersList[order].status = 'pending'
+  ordersList[order].status = 'pending';
+//   ordersList[order].item_quantity_shipment_deliverable = ordersList.length;
+//   ordersList[order].item_quantity_deliverable = ordersList.length;
 } else if (ordersList[order].fulfillment_status == 'shipped'){
   ordersList[order].status = 'complete'
 }
@@ -77,6 +79,9 @@ async function createOrders(){
                         product_id: res.results[0].id,
                         price: line_item.price,
                         quantity: line_item.quantity,
+                        quantity_shipment_deliverable: line_item.fulfillable_quantity,
+                        quantity_deliverable: line_item.fulfillable_quantity,
+                        delivery: 'shipment'
                         //TODO: Add more fields as necessary
                     });
                 } else { //item is a variant
@@ -96,6 +101,9 @@ async function createOrders(){
                             name: res.results[0].name,
                         },
                         quantity: line_item.quantity,
+                        quantity_shipment_deliverable: line_item.fulfillable_quantity,
+                        quantity_deliverable: line_item.fulfillable_quantity,
+                        delivery: 'shipment'
                     });
     
                 }
@@ -177,7 +185,7 @@ async function postOrders(){
   
  // console.log(reqList.items);
   try{
-      console.log(reqList)
+ //     console.log(reqList)
      await swell.post('/:batch', reqList);
       process.exit();
       } catch(e){
