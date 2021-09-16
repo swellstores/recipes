@@ -11,9 +11,6 @@ var singleProductList;
 var variantsProductList;
 var swellParentsList;
 
-//TODO: Add stock quantities
-//TODO: Add type
-//TODO: Add delivery
 
 async function getProducts (){
   try {
@@ -27,14 +24,15 @@ async function getProducts (){
     });
 
     productList = response.data.products;
-    variantsProductList =  productList.filter((val, index) => val.variants.length > 1);
-    singleProductList = productList.filter((val, index) => val.variants.length == 1);
+    variantsProductList =  productList.filter((val, index) => val.variants.length > 1); //Products with variants
+    singleProductList = productList.filter((val, index) => val.variants.length == 1); //Single products
     singleProductList.forEach((element, index) => {
      //Product has no variants => Create single product
-        element.price = element.variants[0].price
-        element.sku = element.variants[0].sku
-        element.shopify_id = element.variants[0].product_id
-        delete element.variants //Remove variants?
+        element.price = element.variants[0].price;
+        element.sku = element.variants[0].sku;
+        element.shopify_id = element.variants[0].product_id;
+        element.stock_level = element.inventory_quantity;
+        delete element.variants; //Remove variants?
       
     });
 
@@ -58,6 +56,10 @@ async function getProducts (){
         slug: data.handle,
         price: data.price,
         sku: data.sku,
+        stock_level: data.stock_level,
+        shipment_weight: data.weight,
+        type: 'standard',
+        delivery: 'shipment'
       }
     }));
 
@@ -70,9 +72,10 @@ async function getProducts (){
         slug: data.handle,
         hasVariants: true,
         sku: data.sku,
+        type: 'standard',
       }
     }));
-    return singleProductListFormat;
+    // return singleProductListFormat;
 } catch (e) {
     console.log(e)
 }
@@ -136,7 +139,8 @@ async function createVariants(){
         price: data.price,
         sku: data.sku,
         shipment_weight: data.weight,
-        shopify_id: data.id
+        shopify_id: data.id,
+        stock_level: data.inventory_quantity,
       }
     }));
 

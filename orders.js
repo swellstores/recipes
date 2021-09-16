@@ -48,8 +48,10 @@ async function setStatuses() {
         //Set fulfillment status
         if (ordersList[order].fulfillment_status == 'unfulfilled' || ordersList[order].fulfillment_status == null || ordersList[order].fulfillment_status == 'partial') {
             ordersList[order].status = 'pending';
-        } else if (ordersList[order].fulfillment_status == 'shipped') {
-            ordersList[order].status = 'complete'
+        } else if (ordersList[order].fulfillment_status == 'fulfilled') {
+            ordersList[order].status = 'complete';
+            ordersList[order].delivered = 'true';
+            ordersList[order].delivery_marked = true;
         }
     };
 }
@@ -121,7 +123,7 @@ async function createOrders() {
             var res = await swell.get('/accounts', {
                 limit: 1000,
                 where: {
-                    shopify_id: ordersList[order].customer.id.toString()
+                    shopify_id: ordersList[order].customer.id
                 }
             });
             swellCustomer = res.results[0].id;
@@ -178,7 +180,9 @@ async function postOrders() {
             item_tax: data.total_tax,
             sub_total: data.subtotal_price,
             grand_total: data.current_total_price,
-            date_created: data.created_at //TODO: Fix time stamps
+            date_created: data.created_at,//TODO: Fix time stamps
+            delivered: data.delivered,
+            delivery_marked: data.delivery_marked
         }
     }));
 

@@ -22,7 +22,7 @@ async function getCustomers() {
         formattedList = customerList.map(data => ({
             url: "/accounts", data: {
                 $restore: true,
-                shopify_id: data.customer_id,
+                shopify_id: data.id,
                 email: data.email,
                 first_name: data.first_name,
                 last_name: data.last_name,
