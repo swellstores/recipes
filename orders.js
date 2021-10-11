@@ -1,8 +1,6 @@
 const axios = require('axios');
-const { post, get } = require('swell-node');
 require('dotenv').config();
 const swell = require('swell-node');
-const { create } = require('swell-node/lib/client');
 
 swell.init(process.env.SWELL_STORE_ID, process.env.SWELL_API_KEY);
 
@@ -32,6 +30,19 @@ async function setStatuses() {
     console.log('settings statuses');
 
     for (const order in ordersList) {
+
+    //     //Format time
+    //     var date = ordersList[order].created_at;
+    //     console.log('date: ' + date)
+    //     var newDate = new Date(date).toUTCString();
+    //     var iso = new Date(date).toISOString().slice(0, 19) + 'Z'
+    //   //  var iso = newDate.toUTCString();
+    //     console.log('utc: ' + newDate);
+    //     console.log('iso: ' + iso);
+    //     console.log('offset: ' + new Date(date).getTimezoneOffset());
+    //    // console.log(newDate.toISOString());
+    //     ordersList[order].date_created = iso;
+
         //Set financial status
         if (ordersList[order].financial_status == 'paid') {
             ordersList[order].payment_marked = true;
@@ -91,7 +102,7 @@ async function createOrders() {
                         shopify_id: line_item.variant_id
                     }
                 });
-                console.log(res);
+            //    console.log(res);
                 items.push({
                     product_id: res.results[0].parent_id,
                     price: res.results[0].price,
@@ -177,19 +188,22 @@ async function postOrders() {
             payment_balance: data.payment_balance,
             refunded: data.refunded,
             number: data.order_number,
-            item_tax: data.total_tax,
             sub_total: data.subtotal_price,
             grand_total: data.current_total_price,
-            date_created: data.created_at,//TODO: Fix time stamps
+            date_created: data.created_at,
             delivered: data.delivered,
-            delivery_marked: data.delivery_marked
+            delivery_marked: data.delivery_marked,
+            tax_total: data.total_tax,
+            shipping_price: data.total_shipping_price_set.shop_money.amount,
+            shopify_id: data.id,
+            discount_total: data.current_total_discounts
         }
     }));
 
     // console.log(reqList.items);
     try {
         //     console.log(reqList)
-        await swell.post('/:batch', reqList);
+       // await swell.post('/:batch', reqList);
         process.exit();
     } catch (e) {
         process.exit()

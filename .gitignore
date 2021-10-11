@@ -1,3 +1,5 @@
 /node_modules
 .env
 .vscode
+shopify_recursive.js
+

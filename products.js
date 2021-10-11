@@ -57,6 +57,7 @@ async function getProducts (){
         price: data.price,
         sku: data.sku,
         stock_level: data.stock_level,
+        stock_tracking: true,
         shipment_weight: data.weight,
         type: 'standard',
         delivery: 'shipment'
@@ -141,6 +142,7 @@ async function createVariants(){
         shipment_weight: data.weight,
         shopify_id: data.id,
         stock_level: data.inventory_quantity,
+        stock_tracking: true
       }
     }));
 
@@ -151,10 +153,6 @@ async function createVariants(){
   }
 }
 
-// getProducts().then(() => {
-//    createSwellProducts(singleProductListFormat, variantsProductListFormat);
-//   createVariants();
-// });
 
 module.exports.main = async function main(){
   await getProducts();
