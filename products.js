@@ -12,39 +12,65 @@ var variantsProductList;
 var swellParentsList;
 
 
-async function getProducts (){
+async function getProducts() {
   try {
     //TODO: recursive call to get all products
     const response = await axios.get(`https://${process.env.SHOPIFY_HOST}/admin/api/${process.env.SHOPIFY_API_VERSION}/products.json`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Shopify-Access-Token': process.env.SHOPIFY_PASSWORD
-        },
-        limit: 250,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Access-Token': process.env.SHOPIFY_PASSWORD
+      },
+      limit: 250,
     });
 
     productList = response.data.products;
-    variantsProductList =  productList.filter((val, index) => val.variants.length > 1); //Products with variants
+    variantsProductList = productList.filter((val, index) => val.variants.length > 1); //Products with variants
     singleProductList = productList.filter((val, index) => val.variants.length == 1); //Single products
     singleProductList.forEach((element, index) => {
-     //Product has no variants => Create single product
-        element.price = element.variants[0].price;
-        element.sku = element.variants[0].sku;
-        element.shopify_id = element.variants[0].product_id;
-        element.stock_level = element.inventory_quantity;
-        delete element.variants; //Remove variants?
-      
+      //Product has no variants => Create single product
+      element.price = element.variants[0].price;
+      element.sku = element.variants[0].sku;
+      element.shopify_id = element.variants[0].product_id;
+      element.stock_level = element.inventory_quantity;
+      delete element.variants; 
     });
 
-    
-  variantsProductList.forEach(val => {
-    val.options.forEach(varValue => {
-      varValue.shopify_id = varValue.product_id,
-      delete varValue.id;
-      delete varValue.product_id;
-      varValue.variant = true
+    //Set images
+    singleProductList.forEach((element) => {
+      var images = [];
+      element.images.forEach((image) => {
+        images.push({
+          "file": {
+            "shopify_id": image.variant_ids,
+            "url": image.src
+          }
+        });
+      });
+      element.images = images;
     });
-  });
+
+    variantsProductList.forEach((element) => {
+      var images = [];
+      element.images.forEach(image => {
+        images.push({
+          "file": {
+            "shopify_id": image.variant_ids,
+            "url": image.src
+          }
+        });
+      });
+      element.images = images;
+    });
+
+    //Set variants
+    variantsProductList.forEach(val => {
+      val.options.forEach(varValue => {
+        varValue.shopify_id = varValue.product_id,
+          delete varValue.id;
+        delete varValue.product_id;
+        varValue.variant = true
+      });
+    });
 
     singleProductListFormat = singleProductList.map(data => ({
       url: '/products', data: {
@@ -60,7 +86,9 @@ async function getProducts (){
         stock_tracking: true,
         shipment_weight: data.weight,
         type: 'standard',
-        delivery: 'shipment'
+        delivery: 'shipment',
+        active: true,
+        images: data.images
       }
     }));
 
@@ -74,63 +102,69 @@ async function getProducts (){
         hasVariants: true,
         sku: data.sku,
         type: 'standard',
+        images: data.images
       }
     }));
-    // return singleProductListFormat;
-} catch (e) {
-    console.log(e)
-}
-}
 
-
-async function createSwellProducts(list1, list2){
-  try{
-    await swell.post('/:batch', list1);
-    await swell.post('/:batch', list2);
-  } catch(e){
+  } catch (e) {
     console.log(e)
+    process.exit(1);
   }
 }
 
-async function getSwellParents(){
-  try{
+
+async function createSwellProducts(list1, list2) {
+  try {
+    await swell.post('/:batch', list1);
+    await swell.post('/:batch', list2);
+  } catch (e) {
+    console.log(e);
+    process.exit(1);
+  }
+}
+
+async function getSwellParents() {
+  try {
     swellParentsList = await swell.get('/products', {
       limit: 1000,
       where: {
         hasVariants: true
       }
     });
-  } catch(e){
+  } catch(e) {
     console.log(e);
+    process.exit(1);
   }
 }
 
- function getProductId(shopify_id){
-  for (var i = 0; i < swellParentsList.results.length; i++){
-    if (swellParentsList.results[i].shopify_id == shopify_id){
+function getProductId(shopify_id) {
+  for (var i = 0; i < swellParentsList.results.length; i++) {
+    if (swellParentsList.results[i].shopify_id == shopify_id) {
       return swellParentsList.results[i].id;
     }
   }
 }
 
-async function createVariants(){
-  try{
+async function createVariants() {
+  try {
 
     await getSwellParents();
 
     var variantsList = [];
 
     //Combine variants and concat
-    for (var i = 0; i < variantsProductList.length; i++){
+    for (var i = 0; i < variantsProductList.length; i++) {
       variantsList.push(variantsProductList[i].variants);
     }
     var concatList = variantsList.flat();
 
     concatList.forEach(element => {
-      var parentProductId =  getProductId(element.product_id);
-      element.parent_id =  parentProductId;
+      var parentProductId = getProductId(element.product_id);
+      element.parent_id = parentProductId;
     });
-    
+
+   
+
     var req = concatList.map(data => ({
       url: '/products:variants', data: {
         parent_id: data.parent_id,
@@ -142,19 +176,22 @@ async function createVariants(){
         shipment_weight: data.weight,
         shopify_id: data.id,
         stock_level: data.inventory_quantity,
-        stock_tracking: true
+        stock_tracking: true,
+        active: true,
+        images: data.images
       }
     }));
 
-   await swell.post('/:batch', req);
+    await swell.post('/:batch', req);
     process.exit();
-  } catch(e){
+  } catch (e) {
     console.log(e);
+    process.exit(1);
   }
 }
 
 
-module.exports.main = async function main(){
+module.exports.main = async function main() {
   await getProducts();
   await createSwellProducts(singleProductListFormat, variantsProductListFormat);
   await createVariants();

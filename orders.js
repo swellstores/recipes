@@ -18,9 +18,9 @@ async function getOrders() {
             limit: 250,
         });
         ordersList = response.data.orders;
-        // console.log(ordersList)
     } catch (e) {
         console.log(e)
+        process.exit(1);
     }
     return ordersList;
 
@@ -31,17 +31,17 @@ async function setStatuses() {
 
     for (const order in ordersList) {
 
-    //     //Format time
-    //     var date = ordersList[order].created_at;
-    //     console.log('date: ' + date)
-    //     var newDate = new Date(date).toUTCString();
-    //     var iso = new Date(date).toISOString().slice(0, 19) + 'Z'
-    //   //  var iso = newDate.toUTCString();
-    //     console.log('utc: ' + newDate);
-    //     console.log('iso: ' + iso);
-    //     console.log('offset: ' + new Date(date).getTimezoneOffset());
-    //    // console.log(newDate.toISOString());
-    //     ordersList[order].date_created = iso;
+        //     //Format time
+        //     var date = ordersList[order].created_at;
+        //     console.log('date: ' + date)
+        //     var newDate = new Date(date).toUTCString();
+        //     var iso = new Date(date).toISOString().slice(0, 19) + 'Z'
+        //   //  var iso = newDate.toUTCString();
+        //     console.log('utc: ' + newDate);
+        //     console.log('iso: ' + iso);
+        //     console.log('offset: ' + new Date(date).getTimezoneOffset());
+        //    // console.log(newDate.toISOString());
+        //     ordersList[order].date_created = iso;
 
         //Set financial status
         if (ordersList[order].financial_status == 'paid') {
@@ -70,16 +70,14 @@ async function setStatuses() {
 async function createOrders() {
     console.log('creating orders');
 
-
-    //find swell customer based on shopify_id field
     for (const order of ordersList) {
-        //find swell products based on shopify_id
-        for (const line_item of order.line_items) {
-            //    console.log(line_item);
 
+        for (const line_item of order.line_items) {
             var items = [];
+
             //Check if item is variant or product
             if (line_item.variant_title == "") { //Item is not a variant
+                //find swell products based on shopify_id
                 var res = await swell.get('/products', {
                     limit: 1000,
                     where: {
@@ -102,7 +100,7 @@ async function createOrders() {
                         shopify_id: line_item.variant_id
                     }
                 });
-            //    console.log(res);
+
                 items.push({
                     product_id: res.results[0].parent_id,
                     price: res.results[0].price,
@@ -121,14 +119,14 @@ async function createOrders() {
             }
 
             order.line_items = items;
-            //console.log(element);
+
         };
 
-        // ordersList = list;
-        //   console.log(ordersList);
+
     };
 
 
+    //find swell customer based on shopify_id field
     for (const order in ordersList) {
         try {
             var res = await swell.get('/accounts', {
@@ -137,11 +135,13 @@ async function createOrders() {
                     shopify_id: ordersList[order].customer.id
                 }
             });
+            //Set swell customer
             swellCustomer = res.results[0].id;
             ordersList[order].swellCustomer = swellCustomer;
-            //   console.log(order.swellCustomer)//Set swell customer
+
         } catch (e) {
             console.log(e);
+            process.exit(1);
         }
     };
 
@@ -200,13 +200,13 @@ async function postOrders() {
         }
     }));
 
-    // console.log(reqList.items);
+
     try {
-        //     console.log(reqList)
-       // await swell.post('/:batch', reqList);
+        await swell.post('/:batch', reqList);
         process.exit();
     } catch (e) {
-        process.exit()
+        console.log(e)
+        process.exit(1);
     }
 
 }

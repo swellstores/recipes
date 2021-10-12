@@ -17,10 +17,10 @@ Swell also has native import functionality for Products and Customers, and these
 - Clone the repo
 - `npm install`
 - Create a Shopify Private App
-    - instructions
+    - Instructions: https://help.shopify.com/en/manual/apps/private-apps#generate-credentials-from-the-shopify-admin
 - Create a `.env` file, use the `.env.template` file to create the following variables
     ```
-    SWELL_API_KEY=
+    SWELL_API_KEY={secret_key}
     SWELL_STORE_ID=
     SHOPIFY_HOST={store_name}.myshopify.com
     SHOPIFY_API_VERSION=
@@ -28,17 +28,24 @@ Swell also has native import functionality for Products and Customers, and these
     SHOPIFY_PASSWORD={shppa_...}
     ```
 - Run scripts with the following command from the root directory: `npm run customers`
-    - Pass in the file names to run the different scripts. The correct order should be:
+
+     Pass in the file names to run the different scripts. The correct order should be:
     1) Customers
     2) Products (includes variants)
     3) Orders
 
 ## Disclaimers
-**Currently, Shopify limits requests to 250 records. If you need to migrate over more records, you will need to make recursive calls for each of the scripts**
+**Currently, Shopify limits requests to 250 records. If you need to migrate over more records, you will need to make recursive or paginated calls for each of the scripts**
 
 
 ### Products
-- Product images are not transfered over at this time (in-progress)
+- In order to switch over the image hosting from Shopify to Swell, you'll have to export the products and re-import them from your Swell store.
+    1) Select **All products** from your Swell dashboard
+    2) Select the checkboxes for the items you want to export
+    3) Click **export** > CSV > Export
+    4) Click **import** > Select the exported CSV > Ensure **Overwrite existing products** is selected > Upload. This will ensure your product images are hosted on Swell when you deactivate your Shopify store.
+
+
 
 ### Orders
 - Ensure that your orders are unarchived before exporting.

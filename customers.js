@@ -16,7 +16,7 @@ async function getCustomers() {
                 'Content-Type': 'application/json',
                 'X-Shopify-Access-Token': process.env.SHOPIFY_PASSWORD
             },
-            limit: 250 
+            limit: 250
         });
         customerList = response.data.customers;
         formattedList = customerList.map(data => ({
@@ -56,7 +56,8 @@ async function getCustomers() {
         return customerObjectList;
 
     } catch (e) {
-        console.log(e)
+        console.log(e);
+        process.exit(1);
     }
 }
 
@@ -66,15 +67,12 @@ async function createSwellCustomers(list) {
         process.exit();
     } catch (e) {
         console.log(e);
+        process.exit(1);
     }
 }
 
 
-// getCustomers().then(() => {
-//     createSwellCustomers(customerObjectList);
-// });
-
-module.exports.main = async function main(){
+module.exports.main = async function main() {
     await getCustomers();
     await createSwellCustomers(customerObjectList);
 }
