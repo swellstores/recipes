@@ -102,7 +102,8 @@ async function getProducts() {
         hasVariants: true,
         sku: data.sku,
         type: 'standard',
-        images: data.images
+        images: data.images,
+        active: true
       }
     }));
 
