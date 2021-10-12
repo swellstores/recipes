@@ -30,9 +30,9 @@ Swell also has native import functionality for Products and Customers, and these
 - Run scripts with the following command from the root directory: `npm run customers`
 
      Pass in the file names to run the different scripts. The correct order should be:
-    1) Customers
-    2) Products (includes variants)
-    3) Orders
+    1) `npm run customers`
+    2) `npm run products`
+    3) `npm run orders`
 
 ## Disclaimers
 **Currently, Shopify limits requests to 250 records. If you need to migrate over more records, you will need to make recursive or paginated calls for each of the scripts**
