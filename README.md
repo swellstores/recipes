@@ -17,7 +17,7 @@ Swell also has native import functionality for Products and Customers, and these
 - Clone the repo
 - `npm install`
 - Create a Shopify Private App
-    - Instructions: https://help.shopify.com/en/manual/apps/private-apps#generate-credentials-from-the-shopify-admin
+    - Instructions: https://help.shopify.com/en/manual/apps/app-types/custom-apps
 - Create a `.env` file, use the `.env.template` file to create the following variables
     ```
     SWELL_API_KEY={secret_key}
