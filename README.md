@@ -16,17 +16,23 @@ Swell also has native import functionality for Products and Customers, and these
 ## Setup Instructions
 - Clone the repo
 - `npm install`
-- Create a Shopify Private App
+- Create a Shopify Custom App
+    - From your Shopify admin, go to **Settings > Apps and sales channels > Develop apps**
+    - Create an app, then configure its **Admin API scopes** (read access to products, orders, and customers)
+    - Install the app, then copy the **Admin API access token** (starts with `shpat_`). The token is only revealed once, so store it securely.
     - Instructions: https://help.shopify.com/en/manual/apps/app-types/custom-apps
 - Create a `.env` file, use the `.env.template` file to create the following variables
     ```
     SWELL_API_KEY={secret_key}
     SWELL_STORE_ID=
-    SHOPIFY_HOST={store_name}.myshopify.com
-    SHOPIFY_API_VERSION=
+    SHOPIFY_HOST={store_id}.myshopify.com
+    SHOPIFY_API_VERSION=2025-07
     SHOPIFY_API_KEY=
-    SHOPIFY_PASSWORD={shppa_...}
+    SHOPIFY_PASSWORD={shpat_...}
     ```
+    - `SHOPIFY_HOST` is your store's full `.myshopify.com` domain (e.g. `my-store.myshopify.com`), without `https://` — the scripts use it to build the Admin API URL.
+    - `SHOPIFY_API_VERSION` is the Admin API version your custom app uses (e.g. `2025-07`).
+    - `SHOPIFY_PASSWORD` is the custom app's Admin API access token (`shpat_...`).
 - Run scripts with the following command from the root directory: `npm run customers`
 
      Pass in the file names to run the different scripts. The correct order should be:
